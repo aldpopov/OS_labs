@@ -7,30 +7,35 @@
 #include <errno.h>
 #include <limits.h>
 
-
 void ProcessData(int writeFd) {
-    int num, sum = 0;
+    float num, sum = 0;
     char buffer[1024];
+    char *token;
 
-    while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-      num = atoi(buffer);
-      sum += num;
+    if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+        token = strtok(buffer, " "); // Разбиваем строку на токены по пробелам
+        while (token != NULL) {
+            num = atof(token);
+            sum += num;
+            token = strtok(NULL, " "); // Получаем следующий токен
+        }
     }
-    
-    char resultStr[1024]; //Ensure sufficient buffer size
-    snprintf(resultStr, sizeof(resultStr), "Sum: %d\n", sum);
+
+    char resultStr[1024];
+    snprintf(resultStr, sizeof(resultStr), "Sum: %.2f\n", sum);
 
     ssize_t bytesWritten = write(writeFd, resultStr, strlen(resultStr));
 
     if (bytesWritten == -1) {
         fprintf(stderr, "Write error: %s\n", strerror(errno));
-        exit(1); //Exit on error in C
+        exit(1);
     } else if (bytesWritten < strlen(resultStr)) {
         fprintf(stderr, "Warning: written only %zd bytes from %zu\n", bytesWritten, strlen(resultStr));
     }
 
     close(writeFd);
 }
+
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -55,7 +60,6 @@ int main(int argc, char* argv[]) {
     char *endptr;
     long int writeFdLong = strtol(argv[2], &endptr, 10);
 
-    //Error handling for strtol
     if (*endptr != '\0' || writeFdLong < INT_MIN || writeFdLong > INT_MAX) {
         fprintf(stderr,"Invalid writeFd\n");
         return 1;

@@ -19,7 +19,7 @@ public:
         fileName = "test_file_" + std::to_string(std::rand()) + ".txt";
         std::ofstream outFile(fileName);
         if (!outFile) {
-            throw std::runtime_error("Не удалось создать временный файл");
+            throw std::runtime_error("Failed to create temp file");
         }
         outFile << content;
         outFile.close();
@@ -47,50 +47,50 @@ std::string getOutputFromFile(FILE* file) {
     return result;
 }
 
-TEST(FileTest, StandartPositiveSum) {
-    TempFile tempFile("1.2 2.2 3.2 4.2 5.2");
+TEST(FileTest, Standard_Sum) {
+    TempFile tempFile("12 22 32 42 52");
     FILE* outputFile = tmpfile();
     if (outputFile == nullptr) {
-        FAIL() << "Не удалось создать временный файл";
+        FAIL() << "Failed to create temp file";
     }
     MainTestFunction(tempFile.getFileName().c_str(), outputFile);
     std::string outputStr = getOutputFromFile(outputFile);
     fclose(outputFile);
-    EXPECT_EQ(outputStr, "Сумма: 16\n");
+    EXPECT_EQ(outputStr, "Sum: 160.00\n");
 }
 
-TEST(FileTest, StandartNegativeSum) {
+TEST(FileTest, Standard_Negative_Sum) {
     TempFile tempFile("-1.1 -1.1 -2.2 -1.1");
     FILE* outputFile = tmpfile();
     if (outputFile == nullptr) {
-        FAIL() << "Не удалось создать временный файл";
+        FAIL() << "Failed to create temp file";
     }
     MainTestFunction(tempFile.getFileName().c_str(), outputFile);
     std::string outputStr = getOutputFromFile(outputFile);
     fclose(outputFile);
-    EXPECT_EQ(outputStr, "Сумма: -5.5\n");
+    EXPECT_EQ(outputStr, "Sum: -5.50\n");
 }
 
-TEST(FileTest, StandartMeshSum) {
+TEST(FileTest, Standard_Mesh_Sum) {
     TempFile tempFile("-1.1 1.25 2.4 -1.05");
     FILE* outputFile = tmpfile();
     if (outputFile == nullptr) {
-        FAIL() << "Не удалось создать временный файл";
+        FAIL() << "Failed to create temp file";
     }
     MainTestFunction(tempFile.getFileName().c_str(), outputFile);
     std::string outputStr = getOutputFromFile(outputFile);
     fclose(outputFile);
-    EXPECT_EQ(outputStr, "Сумма: 1.5\n");
+    EXPECT_EQ(outputStr, "Sum: 1.50\n");
 }
 
-TEST(FileTest, OnlyZeroSum) {
+TEST(FileTest, Zeroes_Sum) {
     TempFile tempFile("0 0 0 0");
     FILE* outputFile = tmpfile();
     if (outputFile == nullptr) {
-        FAIL() << "Не удалось создать временный файл";
+        FAIL() << "Failed to create temp file";
     }
     MainTestFunction(tempFile.getFileName().c_str(), outputFile);
     std::string outputStr = getOutputFromFile(outputFile);
     fclose(outputFile);
-    EXPECT_EQ(outputStr, "Сумма: 0\n");
+    EXPECT_EQ(outputStr, "Sum: 0.00\n");
 }

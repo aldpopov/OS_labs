@@ -7,12 +7,10 @@ build: clean-build
 	cd ./build; cmake ..; make all
 
 run:
-	cd ./LW1
-	ls
-	pwd
-
+	./build/LW1/lab1
+	
 test:
-	./build/*_test
+	./build/tests/*_test
 
 clean-build:
 	rm -rf ./build/

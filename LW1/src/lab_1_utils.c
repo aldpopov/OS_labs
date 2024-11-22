@@ -1,3 +1,4 @@
+#include "lab1.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,7 +18,7 @@ void CreateChildProcess(const char* filename, int pipefd[2]) {
         snprintf(pipeFdStr, sizeof(pipeFdStr), "%d", pipefd[1]);
 
         char* args[] = {
-            "/workspaces/OS_labs/build/LW1/divergent", 
+            "/home/aldpopov/OS_labs/build/LW1/divergent", 
             (char*)filename, 
             pipeFdStr, 
             NULL
