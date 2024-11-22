@@ -9,12 +9,12 @@ void CreateChildProcess(const char* filename, int pipefd[2]) {
     pid_t pid = fork();
 
     if (pid == -1) {
-        perror("Ошибка при создании процесса");
+        perror("Error creating process");
         exit(1);
     }
 
-    if (pid == 0) { // Дочерний процесс
-        char pipeFdStr[12]; // Buffer to hold pipe file descriptor as string
+    if (pid == 0) {
+        char pipeFdStr[12];
         snprintf(pipeFdStr, sizeof(pipeFdStr), "%d", pipefd[1]);
 
         char* args[] = {
@@ -25,7 +25,7 @@ void CreateChildProcess(const char* filename, int pipefd[2]) {
         };
 
         if (execvp(args[0], args) == -1) {
-            perror("Ошибка при запуске дочерней программы");
+            perror("Error starting child program");
             exit(1);
         }
 
@@ -36,12 +36,11 @@ void CreateChildProcess(const char* filename, int pipefd[2]) {
 void ReadFromPipe(int pipefd[2], FILE* output) {
     close(pipefd[1]);
 
-    // чтение данных из pipe и вывод их на экран
     char buffer[1024];
     ssize_t n;
     while ((n = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
-        fwrite(buffer, 1, n, output); // Write to the output file stream
-        fwrite(buffer, 1, n, stdout);  // Write to standard output
+        fwrite(buffer, 1, n, output);
+        fwrite(buffer, 1, n, stdout);
     }
 
     close(pipefd[0]);
@@ -51,7 +50,7 @@ void MainTestFunction(const char* filename, FILE* output) {
     int pipefd[2];
 
     if (pipe(pipefd) == -1) {
-        perror("Ошибка при создании pipe");
+        perror("Error creating pipe");
         exit(1);
     }
 

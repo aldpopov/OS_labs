@@ -13,11 +13,11 @@ void ProcessData(int writeFd) {
     char *token;
 
     if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-        token = strtok(buffer, " "); // Разбиваем строку на токены по пробелам
+        token = strtok(buffer, " ");
         while (token != NULL) {
             num = atof(token);
             sum += num;
-            token = strtok(NULL, " "); // Получаем следующий токен
+            token = strtok(NULL, " ");
         }
     }
 
@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Usage: %s <filename> <writeFd>\n", argv[0]);
         return 1;
     }
-
     int file = open(argv[1], O_RDONLY);
     if (file == -1) {
         perror("Opening error");
