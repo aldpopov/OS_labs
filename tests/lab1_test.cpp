@@ -8,9 +8,6 @@
 #include "lab1.h"
 #include "../LW1/src/lab_1_utils.c"
 
-extern "C" {
-    #include <lab1.h>
-}
 
 class TempFile {
 public:

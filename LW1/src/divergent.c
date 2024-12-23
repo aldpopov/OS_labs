@@ -12,12 +12,34 @@ void ProcessData(int writeFd) {
     char buffer[1024];
     char *token;
 
-    if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-        token = strtok(buffer, " ");
+    while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+        char *line = strtok(buffer, "\n");
+        while (line != NULL) {
+            sum = 0;
+            token = strtok(line, " ");
+            while (token != NULL) {
+                num = atof(token);
+                sum += num;
+                token = strtok(NULL, " ");
+            }
+            char resultStr[1024];
+            snprintf(resultStr, sizeof(resultStr), "Sum: %.2f\n", sum);
+            ssize_t bytesWritten = write(writeFd, resultStr, strlen(resultStr));
+            if (bytesWritten == -1) {
+                fprintf(stderr, "Write error: %s\n", strerror(errno));
+                exit(1);
+            } else if (bytesWritten < strlen(resultStr)) {
+                fprintf(stderr, "Warning: written only %zd bytes from %zu\n", bytesWritten, strlen(resultStr));
+            }
+            line = strtok(NULL, "\n");
+        }
+    }
+    /*while (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+        token = strtok(buffer, " \n");
         while (token != NULL) {
             num = atof(token);
             sum += num;
-            token = strtok(NULL, " ");
+            token = strtok(NULL, " \n");
         }
     }
 
@@ -31,10 +53,11 @@ void ProcessData(int writeFd) {
         exit(1);
     } else if (bytesWritten < strlen(resultStr)) {
         fprintf(stderr, "Warning: written only %zd bytes from %zu\n", bytesWritten, strlen(resultStr));
-    }
+    }*/
 
     close(writeFd);
 }
+
 
 
 int main(int argc, char* argv[]) {

@@ -18,7 +18,7 @@ void CreateChildProcess(const char* filename, int pipefd[2]) {
         snprintf(pipeFdStr, sizeof(pipeFdStr), "%d", pipefd[1]);
 
         char* args[] = {
-            "/home/aldpopov/OS_labs/build/LW1/divergent", 
+            "/home/vboxuser/OS_labs/build/LW1/divergent", 
             (char*)filename, 
             pipeFdStr, 
             NULL
@@ -40,7 +40,6 @@ void ReadFromPipe(int pipefd[2], FILE* output) {
     ssize_t n;
     while ((n = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
         fwrite(buffer, 1, n, output);
-        fwrite(buffer, 1, n, stdout);
     }
 
     close(pipefd[0]);

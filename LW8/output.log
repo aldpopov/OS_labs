@@ -1,0 +1,82 @@
+execve("./build/LW3/lab3", ["./build/LW3/lab3"], 0x7ffffa5e5c60 /* 48 vars */) = 0
+brk(NULL)                               = 0x5dfa34fbf000
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x729412a4b000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=59691, ...}) = 0
+mmap(NULL, 59691, PROT_READ, MAP_PRIVATE, 3, 0) = 0x729412a3c000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\220\243\2\0\0\0\0\0"..., 832) = 832
+pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+fstat(3, {st_mode=S_IFREG|0755, st_size=2125328, ...}) = 0
+pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+mmap(NULL, 2170256, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x729412800000
+mmap(0x729412828000, 1605632, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x28000) = 0x729412828000
+mmap(0x7294129b0000, 323584, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1b0000) = 0x7294129b0000
+mmap(0x7294129ff000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1fe000) = 0x7294129ff000
+mmap(0x729412a05000, 52624, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x729412a05000
+close(3)                                = 0
+mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x729412a39000
+arch_prctl(ARCH_SET_FS, 0x729412a39740) = 0
+set_tid_address(0x729412a39a10)         = 6478
+set_robust_list(0x729412a39a20, 24)     = 0
+rseq(0x729412a3a060, 0x20, 0, 0x53053053) = 0
+mprotect(0x7294129ff000, 16384, PROT_READ) = 0
+mprotect(0x5dfa34281000, 4096, PROT_READ) = 0
+mprotect(0x729412a83000, 8192, PROT_READ) = 0
+prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+munmap(0x729412a3c000, 59691)           = 0
+getrandom("\x39\x56\xf4\x4c\x41\x85\xee\x97", 8, GRND_NONBLOCK) = 8
+brk(NULL)                               = 0x5dfa34fbf000
+brk(0x5dfa34fe0000)                     = 0x5dfa34fe0000
+fstat(0, {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0), ...}) = 0
+read(0, "a\n", 1024)                    = 2
+unlink("/dev/shm/sem.semaphore_write")  = 0
+unlink("/dev/shm/sem.semaphore_read")   = 0
+openat(AT_FDCWD, "/dev/shm/sem.semaphore_write", O_RDWR|O_NOFOLLOW|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+getrandom("\x3a\x59\xc4\xd3\xcb\xb4\x1d\xc7", 8, GRND_NONBLOCK) = 8
+newfstatat(AT_FDCWD, "/dev/shm/sem.wWTIG7", 0x7fff4f4c1640, AT_SYMLINK_NOFOLLOW) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/dev/shm/sem.wWTIG7", O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, 0666) = 3
+write(3, "\0\0\0\0\0\0\0\0\200\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 32) = 32
+mmap(NULL, 32, PROT_READ|PROT_WRITE, MAP_SHARED, 3, 0) = 0x729412a4a000
+link("/dev/shm/sem.wWTIG7", "/dev/shm/sem.semaphore_write") = 0
+fstat(3, {st_mode=S_IFREG|0664, st_size=32, ...}) = 0
+unlink("/dev/shm/sem.wWTIG7")           = 0
+close(3)                                = 0
+openat(AT_FDCWD, "/dev/shm/sem.semaphore_read", O_RDWR|O_NOFOLLOW|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+getrandom("\xf9\xa8\x98\x25\x1c\x68\x8f\x59", 8, GRND_NONBLOCK) = 8
+newfstatat(AT_FDCWD, "/dev/shm/sem.7rScGO", 0x7fff4f4c1640, AT_SYMLINK_NOFOLLOW) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/dev/shm/sem.7rScGO", O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC, 0666) = 3
+write(3, "\0\0\0\0\0\0\0\0\200\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 32) = 32
+mmap(NULL, 32, PROT_READ|PROT_WRITE, MAP_SHARED, 3, 0) = 0x729412a49000
+link("/dev/shm/sem.7rScGO", "/dev/shm/sem.semaphore_read") = 0
+fstat(3, {st_mode=S_IFREG|0664, st_size=32, ...}) = 0
+unlink("/dev/shm/sem.7rScGO")           = 0
+close(3)                                = 0
+openat(AT_FDCWD, "/dev/shm/virtual_memory", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0666) = 3
+ftruncate(3, 10240)                     = 0
+openat(AT_FDCWD, "a", O_RDONLY)         = 4
+clone(child_stack=NULL, flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD, child_tidptr=0x729412a39a10) = 6481
+mmap(NULL, 10240, PROT_READ|PROT_WRITE, MAP_SHARED, 3, 0) = 0x729412a46000
+futex(0x729412a49000, FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME, 0, NULL, FUTEX_BITSET_MATCH_ANY) = 0
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0), ...}) = 0
+write(1, "26.80\n", 6)                  = 6
+futex(0x729412a4a000, FUTEX_WAKE, 1)    = 1
+futex(0x729412a49000, FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME, 0, NULL, FUTEX_BITSET_MATCH_ANY) = 0
+write(1, "0.00\n", 5)                   = 5
+futex(0x729412a4a000, FUTEX_WAKE, 1)    = 1
+write(1, "7.51\n", 5)                   = 5
+futex(0x729412a4a000, FUTEX_WAKE, 1)    = 1
+munmap(0x729412a46000, 1024)            = 0
+wait4(6481, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], 0, NULL) = 6481
+--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=6481, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+munmap(0x729412a49000, 32)              = 0
+munmap(0x729412a4a000, 32)              = 0
+unlink("/dev/shm/sem.semaphore_write")  = 0
+unlink("/dev/shm/sem.semaphore_read")   = 0
+close(3)                                = 0
+unlink("/dev/shm/virtual_memory")       = 0
+close(4)                                = 0
+exit_group(0)                           = ?
++++ exited with 0 +++
