@@ -12,6 +12,9 @@
 
 #define MAX_CMD_LENGTH 1024
 
+//TreeNode* root = NULL;
+//UpcomingOperation* upcoming_operations = NULL;
+
 void handle_signal(int signal) {
     if (root != NULL) {
         kill_tree(root);
@@ -72,7 +75,7 @@ int main() {
                 if (fgets(pattern, MAX_TEXT_LENGTH, stdin) == NULL) {
                     break;
                 }
-                pattern[strcspn(text, "\n")] = 0;
+                pattern[strcspn(pattern, "\n")] = 0;
 
                 exec(node_id, text, pattern);
             } else if (sscanf(command, "kill %d", &process_id) == 1) {

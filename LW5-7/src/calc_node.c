@@ -12,20 +12,27 @@ void start_calc_node(int node_id, int parent_id) {
     char endpoint[64];
     sprintf(endpoint, "tcp://*:%d", 5555 + node_id);
     zmq_bind(socket, endpoint);
+
     current_node = create_node(node_id, getpid(), endpoint);
 
     while (1) {
         Message msg;
         int recv_result = receive_message(socket, &msg);
         if (recv_result > 0) {
+            //printf("Node %d: Received message from %d, target_id: %d, command: %s, data: %s\n",
+                   //node_id, msg.source_id, msg.target_id, msg.command, msg.data);
+
             if (msg.target_id == node_id) {
                 if (strcmp(msg.command, CMD_EXEC) == 0) {
+                    //printf("Node %d: Processing CMD_EXEC\n", node_id);
                     char* result = find_substring(msg.data, msg.data + strlen(msg.data) + 1);
                     sprintf(msg.data, "%d: %s", node_id, result);
                     send_message(socket, &msg);
+                    //printf("Node %d: Sent response for CMD_EXEC\n", node_id);
                 } else if (strcmp(msg.command, CMD_PING) == 0) {
                     strcpy(msg.data, "1");
                     send_message(socket, &msg);
+                    //printf("Node %d: Sent response for CMD_PING\n", node_id);
                 }
             } else {
                 int child_id = determine_child_to_forward(root, node_id, msg.target_id);
@@ -35,17 +42,18 @@ void start_calc_node(int node_id, int parent_id) {
                     sprintf(child_endpoint, "tcp://localhost:%d", 5555 + child_id);
                     zmq_connect(forward_socket, child_endpoint);
                     msg.source_id = node_id;
-
                     send_message(forward_socket, &msg);
-
+                    //printf("Node %d: Forwarded message to child %d\n", node_id, child_id);
                     receive_message(forward_socket, &msg);
-
+                    //printf("Node %d: Received response from child %d: %s\n", node_id, child_id, msg.data);
                     send_message(socket, &msg);
+                    //printf("Node %d: Forwarded response back to sender\n", node_id);
 
                     zmq_close(forward_socket);
                 } else {
                     strcpy(msg.data, "-1");
                     send_message(socket, &msg);
+                    printf("Node %d: Target node not found, sent -1\n", node_id);
                 }
             }
         }

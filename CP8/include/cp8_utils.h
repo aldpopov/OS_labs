@@ -37,7 +37,7 @@ bool IsCyclicUtil(int node, std::unordered_map<int, std::vector<int>>& graph,
 
 bool IsCyclic(std::unordered_map<int, std::vector<int>>& graph);
 
-bool ValidateDAG(std::unordered_map<int, std::vector<int>>& graph);
+bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph);
 
 void ExecuteJob(const std::string& jobName, pthread_barrier_t* barrier, std::atomic<bool>& errorFlag, int execTime);
 

@@ -7,7 +7,7 @@ build: clean-build
 	cd ./build; cmake ..; make all
 
 run:
-	./build/CP8/cp ./config.yaml 2
+	./build/CP8/cp8 ./config.yaml 2
 
 run_5:
 	./build/LW5-7/manage_node

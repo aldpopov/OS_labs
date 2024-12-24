@@ -1,4 +1,4 @@
-#include "../include/tools.h"
+#include "../include/cp8_utils.h"
 
 #include <iostream>
 #include <thread>
@@ -34,7 +34,7 @@ bool IsCyclic(std::unordered_map<int, std::vector<int>>& graph) {
     return false;
 }
 
-bool ValidateDAG(std::unordered_map<int, std::vector<int>>& graph) {
+bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph) {
     std::unordered_set<int> ids;
 
     for (auto& [fst, _] : graph) {

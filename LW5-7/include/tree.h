@@ -10,7 +10,7 @@ typedef struct TreeNode {
     int id;
     pid_t pid;
     char endpoint[64];
-    bool available; // Новое поле для отслеживания доступности узла
+    bool available;
     struct TreeNode* left;
     struct TreeNode* right;
 } TreeNode;
@@ -27,3 +27,4 @@ void print_tree_recursive(TreeNode* node, int level);
 void print_tree(TreeNode* root);
 TreeNode* find_node_by_pid(TreeNode* root, pid_t pid);
 int determine_child_to_forward(TreeNode* root, int current_id, int target_id);
+int find_path(TreeNode* root, int current_id, int target_id, int* path);

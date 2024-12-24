@@ -1,4 +1,4 @@
-#include "../include/tools.h"
+#include "../include/cp8_utils.h"
 
 #include <iostream>
 #include <fstream>
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (!ValidateDAG(graph)) {
+    if (!CheckDAG(graph)) {
         return 1;
     }
 

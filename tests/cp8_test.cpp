@@ -6,9 +6,8 @@
 #include <cstring>
 #include <pthread.h>
 
-#include "tools.h"
+#include "cp8_utils.h"
 
-// Тест для функции IsCyclicUtil
 TEST(isCyclicUtil, test)
 {
     auto id = 3;
@@ -33,7 +32,6 @@ TEST(isCyclicUtil, test)
     ASSERT_TRUE(bad);
 }
 
-// Тест для функции IsCyclic
 TEST(isCyclic, test)
 {
     std::unordered_map<int, std::vector<int>> goodGraph = {
@@ -55,7 +53,6 @@ TEST(isCyclic, test)
     ASSERT_TRUE(bad);
 }
 
-// Тест для функции ValidateDAG
 TEST(validateDAG, test)
 {
     auto expectedResult = "Error: DAG contains cycles\nError: DAG is not a single connected component\n";
@@ -81,9 +78,9 @@ TEST(validateDAG, test)
 
     testing::internal::CaptureStderr();
 
-    auto good = ValidateDAG(goodGraph);
-    auto bad1 = ValidateDAG(badGraph1);
-    auto bad2 = ValidateDAG(badGraph2);
+    auto good = CheckDAG(goodGraph);
+    auto bad1 = CheckDAG(badGraph1);
+    auto bad2 = CheckDAG(badGraph2);
 
     auto output = testing::internal::GetCapturedStderr();
 
@@ -93,14 +90,13 @@ TEST(validateDAG, test)
     ASSERT_EQ(output, expectedResult);
 }
 
-// Тест для функции ExecuteJob с барьером
 TEST(executeJob, test)
 {
     auto expectedResult = "Starting job: some\nJob completed: some\n";
 
     auto name = "some";
     pthread_barrier_t barrier;
-    pthread_barrier_init(&barrier, nullptr, 1); // Инициализация барьера
+    pthread_barrier_init(&barrier, nullptr, 1);
 
     std::atomic<bool> errorFlag = false;
     const int execTime = 2;
@@ -113,10 +109,9 @@ TEST(executeJob, test)
 
     ASSERT_EQ(output, expectedResult);
 
-    pthread_barrier_destroy(&barrier); // Уничтожение барьера
+    pthread_barrier_destroy(&barrier);
 }
 
-// Тест для функции ThreadProcess с барьером
 TEST(threadProcess, test)
 {
     auto expectedResult = "Starting job: a\nJob completed: a\nStarting job: b\nJob completed: b\n"
@@ -125,12 +120,11 @@ TEST(threadProcess, test)
     readyJobs.push(1);
     readyJobs.push(2);
 
-    // Correct job dependencies and barriers
     jobs = {
         {1, Job{"a", {}, "barrier1", 1}},
         {2, Job{"b", {}, "barrier2", 2}},
-        {3, Job{"c", {1, 2}, "barrier2", 3}}, // Corrected dependencies
-        {4, Job{"d", {3}, "barrier1", 4}},    // Added dependency on job 3
+        {3, Job{"c", {1, 2}, "barrier2", 3}},
+        {4, Job{"d", {3}, "barrier1", 4}},
     };
 
     graph = {
@@ -147,7 +141,6 @@ TEST(threadProcess, test)
         {4, 1}
     };
 
-    // Initialize barriers with correct counts
     pthread_barrier_t barrier1;
     pthread_barrier_init(&barrier1, nullptr, 1);
 
@@ -161,16 +154,13 @@ TEST(threadProcess, test)
 
     testing::internal::CaptureStdout();
 
-    // Start ThreadProcess in a separate thread
     pthread_t thread;
     pthread_create(&thread, nullptr, ThreadProcess, nullptr);
 
-    // Wait for the thread to finish
     pthread_join(thread, nullptr);
 
     auto output = testing::internal::GetCapturedStdout();
 
-    // Clean up barriers
     pthread_barrier_destroy(&barrier1);
     pthread_barrier_destroy(&barrier2);
 

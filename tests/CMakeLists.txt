@@ -49,7 +49,7 @@ add_executable(LW5-7_test lab5-7_test.cpp ${CONTROL_SRC})
 target_link_libraries(LW5-7_test PRIVATE GTest::GTest ${ZeroMQ_LIBRARIES})
 target_include_directories(LW5-7_test PRIVATE ../LW5-7/include ${ZeroMQ_INCLUDE_DIRS})
 
-add_executable(CP8_test cp8_test.cpp ../CP8/src/tools.cpp)
+add_executable(CP8_test cp8_test.cpp ../CP8/src/cp8_utils.cpp)
 target_link_libraries(CP8_test PRIVATE GTest::GTest)
 target_include_directories(CP8_test PRIVATE ../CP8/include yaml-cpp)
 

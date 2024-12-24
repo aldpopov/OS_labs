@@ -58,6 +58,7 @@ void check_responses(void) {
             zmq_ctx_destroy(current->context);
             free(current);
             current = prev ? prev->next : upcoming_operations;
+            //printf("Debug: node->available = %d, @\n", node->available);
             continue;
         }
 
@@ -72,7 +73,7 @@ void check_responses(void) {
             if (recv_result > 0) {
                 if (strcmp(current->command, CMD_PING) == 0) {
                     printf("Ok: 1\n");
-                } else if (strcmp(current->command, CMD_EXEC) == 0) {
+                } else {
                     printf("Ok: %s\n", msg.data);
                 }
                 if (prev) { prev->next = current->next; }
@@ -100,8 +101,7 @@ void check_responses(void) {
             zmq_ctx_destroy(current->context);
             free(current);
             current = prev ? prev->next : upcoming_operations;
-            printf("> ");
-            fflush(stdout);
+            //printf("Debug: node->available = %d, @\n", node->available);
             continue;
         }
 

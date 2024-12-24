@@ -4,6 +4,7 @@
 #include "zmq.h"
 #include <sys/wait.h>
 #include <errno.h>
+#define MAX_TREE_DEPTH 1024
 
 void check_process_status(TreeNode* root) {
     if (root == NULL) return;
@@ -22,6 +23,8 @@ void check_process_status(TreeNode* root) {
         root->available = true;
     } else if (errno == ECHILD) {
         mark_node_unavailable(root->id);
+    } else {
+        perror("waitpid");
     }
 
     check_process_status(root->left);
@@ -32,6 +35,7 @@ int create_calc_node_recursive(TreeNode* node, int node_id, int parent_id) {
     if (node == NULL) {
         return -1;
     }
+
     if (node->id == parent_id) {
         if (node->left == NULL || node->right == NULL) {
             pid_t process_id = fork();
@@ -44,13 +48,15 @@ int create_calc_node_recursive(TreeNode* node, int node_id, int parent_id) {
             } else if (process_id > 0) {
                 char endpoint[64];
                 sprintf(endpoint, "tcp://localhost:%d", 5555 + node_id);
-                insert_node(root, node_id, process_id, endpoint);
+                insert_node(root, node_id, process_id, endpoint); // BST insertion
                 printf("Ok: %d\n", process_id);
                 return process_id;
             } else {
+                printf("Error: Failed to create process\n");
                 return -1;
             }
         } else {
+            printf("Error: Parent node %d already has two children\n", parent_id);
             return -1;
         }
     }
@@ -65,6 +71,7 @@ int create_calc_node_recursive(TreeNode* node, int node_id, int parent_id) {
 
 int create_calc_node(int node_id, int parent_id) {
     if (is_node_exists(root, node_id)) {
+        printf("Error: Node already exists\n");
         return -1;
     }
     if (parent_id == -1) {
@@ -78,15 +85,18 @@ int create_calc_node(int node_id, int parent_id) {
         } else if (process_id > 0) {
             char endpoint[64];
             sprintf(endpoint, "tcp://localhost:%d", 5555 + node_id);
-            root = insert_node(root, node_id, process_id, endpoint);
+            root = insert_node(root, node_id, process_id, endpoint); // BST insertion
             printf("Ok: %d\n", process_id);
             return process_id;
         } else {
+            printf("Error: Failed to create process\n");
             return -1;
         }
     }
+
     TreeNode* parent_node = find_node(root, parent_id);
     if (parent_node == NULL) {
+        printf("Error: Parent node not found\n");
         return -1;
     }
 
@@ -142,6 +152,7 @@ bool is_node_available(TreeNode* node) {
 int ping_node(int node_id) {
     TreeNode* node = find_node(root, node_id);
     if (!node) {
+        printf("Error: Node not found\n");
         return -1;
     }
 
@@ -190,6 +201,7 @@ void mark_node_unavailable(int node_id) {
     TreeNode* node = find_node(root, node_id);
     if (node) {
         node->available = false;
+        //printf("Debug: Node %d marked as unavailable\n", node_id);
         mark_children_unavailable(node->left);
         mark_children_unavailable(node->right);
     }
@@ -204,10 +216,16 @@ void mark_children_unavailable(TreeNode* node) {
 
 int exec_recursive(TreeNode* node, int target_id, const char* text, const char* pattern) {
     if (node == NULL) {
+        printf("Error: Node not found\n");
         return -1;
     }
 
     if (node->id == target_id) {
+        if (!node->available) {
+            printf("Error:%d: Node is unavailable\n", node->id);
+            return -1; // Узел недоступен, завершаем выполнение
+        }
+
         void* context = zmq_ctx_new();
         void* socket = zmq_socket(context, ZMQ_REQ);
         char endpoint[64];
@@ -216,12 +234,15 @@ int exec_recursive(TreeNode* node, int target_id, const char* text, const char* 
 
         Message msg = {0};
         strcpy(msg.command, CMD_EXEC);
-        msg.source_id = 0;
+        msg.source_id = 0; 
         msg.target_id = node->id;
         strcpy(msg.data, text);
         strcpy(msg.data + strlen(text) + 1, pattern);
+
         add_upcoming_operation(node->id, socket, context, CMD_EXEC);
+
         send_message(socket, &msg);
+        //printf("Debug: Sent message to node %d\n", node->id);
 
         return 0;
     }
@@ -232,6 +253,10 @@ int exec_recursive(TreeNode* node, int target_id, const char* text, const char* 
     } else if (node->right && target_id > node->id) {
         result = exec_recursive(node->right, target_id, text, pattern);
     }
+
+    /*if (result == -1) {
+        printf("Error: Target node %d not found in subtree of node %d\n", target_id, node->id);
+    }*/
 
     return result;
 }
