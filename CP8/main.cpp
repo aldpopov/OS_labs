@@ -1,32 +1,55 @@
-#include "../include/cp8_utils.h"
+#include "./include/cp8_utils.h"
 
 #include <iostream>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 #include <unordered_set>
+#include <sstream>
+
+std::string GetConfigFileName() {
+    std::string configFile;
+    std::cout << "Enter the path to the configuration file: ";
+    std::getline(std::cin, configFile);
+    return configFile;
+}
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <config.yaml> <max_parallel_jobs>" << std::endl;
-        return 1;
-    }
-
-    const std::string configFile = argv[1];
+    std::string configFile;
     int maxParallelJobs;
-    try {
-        maxParallelJobs = std::stoi(argv[2]);
-    } catch (std::invalid_argument&) {
-        std::cerr << "Error: Incorrect args types" << std::endl;
-        return 1;
+    std::string mustBreakInput;
+
+    if (argc >= 2) {
+        configFile = argv[1];
+    } else {
+        configFile = GetConfigFileName();
     }
 
-    if (argc == 4) {
-        mustBreak = argv[3];
+    if (argc >= 3) {
+        try {
+            maxParallelJobs = std::stoi(argv[2]);
+        } catch (std::invalid_argument&) {
+            std::cerr << "Error occured: Incorrect args types" << std::endl;
+            return 1;
+        }
+        if (argc >= 4) {
+            mustBreakInput = argv[3];
+        }
+    } else {
+        std::string input;
+        std::cout << "Enter the maximum number of parallel jobs: ";
+        std::getline(std::cin, input);
+
+        std::istringstream iss(input);
+        iss >> maxParallelJobs >> mustBreakInput;
+    }
+
+    if (!mustBreakInput.empty()) {
+        mustBreak = mustBreakInput;
     }
 
     std::ifstream file(configFile);
     if (!file.is_open()) {
-        std::cerr << "Error: Cannot open file " << configFile << std::endl;
+        std::cerr << "Error occured: Cannot open file " << configFile << std::endl;
         return 1;
     }
 
@@ -40,7 +63,7 @@ int main(int argc, char* argv[]) {
             id = job["id"].as<int>();
 
             if (ids.find(id) != ids.end()) {
-                std::cerr << "Error: DAG contains duplicated ids" << std::endl;
+                std::cerr << "Error occured: Graph contains duplicated ids" << std::endl;
                 return 1;
             }
 
@@ -48,7 +71,7 @@ int main(int argc, char* argv[]) {
             std::string name = job["name"].as<std::string>();
             jobs[id] = {name, job["dependencies"].as<std::vector<int>>(), job["barrier"].as<std::string>(), job["time"].as<int>()};
         } catch (YAML::Exception&) {
-            std::cerr << "Error: Parsing YAML failed" << std::endl;
+            std::cerr << "Error occured: Parsing YAML failed" << std::endl;
             return 1;
         }
         graph[id] = job["dependencies"].as<std::vector<int>>();
@@ -56,14 +79,18 @@ int main(int argc, char* argv[]) {
         if (job["barrier"]) {
             const std::string barrier_name = job["barrier"].as<std::string>();
             if (barriers.find(barrier_name) == barriers.end()) {
+                int barrier_count = 1;
+                if (job["barrier_count"]) {
+                    barrier_count = job["barrier_count"].as<int>();
+                }
                 pthread_barrier_t barrier;
-                pthread_barrier_init(&barrier, nullptr, job["barrier_count"].as<int>());
+                pthread_barrier_init(&barrier, nullptr, barrier_count);
                 barriers.emplace(barrier_name, barrier);
             }
         }
     }
 
-    if (!CheckDAG(graph)) {
+    if (!check_graph(graph)) {
         return 1;
     }
 
@@ -75,10 +102,9 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<pthread_t> workers;
-
     for (int i = 0; i < maxParallelJobs; ++i) {
         pthread_t thread;
-        pthread_create(&thread, nullptr, ThreadProcess, nullptr);
+        pthread_create(&thread, nullptr, thread_process, nullptr);
         workers.emplace_back(thread);
     }
 
@@ -92,7 +118,7 @@ int main(int argc, char* argv[]) {
         pthread_barrier_destroy(&barrier);
     }
 
-    std::cout << (errorFlag ? "Execution failed" : "Execution completed successfully") << std::endl;
+    std::cout << (errorFlag ? "Failure" : "Success") << std::endl;
 
     return 0;
 }

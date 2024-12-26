@@ -1,0 +1,24 @@
+jobs:
+  - id: 3
+    name: "d"
+    dependencies: []
+    barrier: "barrier1"
+    barrier_count: 2
+    time: 4
+  - id: 0
+    name: "a"
+    dependencies: [2] 
+    barrier: "barrier1"
+    time: 1
+  - id: 1
+    name: "b"
+    dependencies: []
+    barrier: "barrier2"
+    barrier_count: 1
+    time: 2
+  - id: 2
+    name: "c"
+    dependencies: [0, 1, 3]
+    barrier: "barrier2"
+    barrier_count: 1
+    time: 3

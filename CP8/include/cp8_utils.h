@@ -32,13 +32,13 @@ inline std::unordered_map<int, std::vector<int>> graph;
 inline std::unordered_map<int, unsigned long> inDegree;
 inline std::unordered_map<std::string, pthread_barrier_t> barriers;
 
-bool IsCyclicUtil(int node, std::unordered_map<int, std::vector<int>>& graph,
+bool is_cyclic_util(int node, std::unordered_map<int, std::vector<int>>& graph,
         std::unordered_map<int, bool>& visited, std::unordered_map<int, bool>& recStack);
 
-bool IsCyclic(std::unordered_map<int, std::vector<int>>& graph);
+bool is_cyclic(std::unordered_map<int, std::vector<int>>& graph);
 
-bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph);
+bool check_graph(std::unordered_map<int, std::vector<int>>& graph);
 
-void ExecuteJob(const std::string& jobName, pthread_barrier_t* barrier, std::atomic<bool>& errorFlag, int execTime);
+void exec(const std::string& jobName, int jobId, pthread_barrier_t* barrier, std::atomic<bool>& errorFlag, int execTime);
 
-void *ThreadProcess(void*);
+void *thread_process(void*);

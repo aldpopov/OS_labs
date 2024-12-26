@@ -1,0 +1,21 @@
+jobs:
+  - id: 1
+    name: "a"
+    dependencies: []
+    barrier: ""
+    time: 1
+  - id: 2
+    name: "b"
+    dependencies: []
+    barrier: ""
+    time: 2
+  - id: 3
+    name: "c"
+    dependencies: [1]
+    barrier: ""
+    time: 3
+  - id: 4
+    name: "d"
+    dependencies: [2]
+    barrier: ""
+    time: 4

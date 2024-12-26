@@ -85,7 +85,7 @@ int create_calc_node(int node_id, int parent_id) {
         } else if (process_id > 0) {
             char endpoint[64];
             sprintf(endpoint, "tcp://localhost:%d", 5555 + node_id);
-            root = insert_node(root, node_id, process_id, endpoint); // BST insertion
+            root = insert_node(root, node_id, process_id, endpoint);
             printf("Ok: %d\n", process_id);
             return process_id;
         } else {

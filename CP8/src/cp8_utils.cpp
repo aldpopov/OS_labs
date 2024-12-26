@@ -7,14 +7,14 @@
 #include <unordered_set>
 #include <yaml-cpp/yaml.h>
 
-bool IsCyclicUtil(const int node, std::unordered_map<int, std::vector<int>>& graph,
+bool is_cyclic_util(const int node, std::unordered_map<int, std::vector<int>>& graph,
         std::unordered_map<int, bool>& visited, std::unordered_map<int, bool>& recStack) {
     if (!visited[node]) {
         visited[node] = true;
         recStack[node] = true;
 
         for (const auto& neighbor : graph[node]) {
-            if (!visited[neighbor] && IsCyclicUtil(neighbor, graph, visited, recStack) || recStack[neighbor])
+            if (!visited[neighbor] && is_cyclic_util(neighbor, graph, visited, recStack) || recStack[neighbor])
                 return true;
         }
     }
@@ -23,18 +23,18 @@ bool IsCyclicUtil(const int node, std::unordered_map<int, std::vector<int>>& gra
     return false;
 }
 
-bool IsCyclic(std::unordered_map<int, std::vector<int>>& graph) {
+bool is_cyclic(std::unordered_map<int, std::vector<int>>& graph) {
     std::unordered_map<int, bool> visited, recStack;
 
     for (const auto& [fst, _] : graph) {
-        if (IsCyclicUtil(fst, graph, visited, recStack))
+        if (is_cyclic_util(fst, graph, visited, recStack))
             return true;
     }
 
     return false;
 }
 
-bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph) {
+bool check_graph(std::unordered_map<int, std::vector<int>>& graph) {
     std::unordered_set<int> ids;
 
     for (auto& [fst, _] : graph) {
@@ -44,7 +44,7 @@ bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph) {
     for (auto& [_, snd] : graph) {
         for (auto id : snd) {
             if (ids.find(id) == ids.end()) {
-                std::cerr << "Error: DAG dependencies contains undefined ids" << std::endl;
+                std::cerr << "Error occured. Graph has undefined ids" << std::endl;
                 return false;
             }
         }
@@ -52,8 +52,8 @@ bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph) {
 
     std::vector<int> startJobs, endJobs;
 
-    if (IsCyclic(graph)) {
-        std::cerr << "Error: DAG contains cycles" << std::endl;
+    if (is_cyclic(graph)) {
+        std::cerr << "Error occured. Graph is cycleic" << std::endl;
         return false;
     }
 
@@ -71,7 +71,7 @@ bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph) {
     }
 
     if (endJobs.empty()) {
-        std::cerr << "Error: No end jobs found" << std::endl;
+        std::cerr << "Error occured. No end jobs found" << std::endl;
         return false;
     }
 
@@ -82,7 +82,7 @@ bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph) {
     }
 
     if (startJobs.empty()) {
-        std::cerr << "Error: No start jobs found" << std::endl;
+        std::cerr << "Error occured. No start jobs found" << std::endl;
         return false;
     }
 
@@ -107,17 +107,16 @@ bool CheckDAG(std::unordered_map<int, std::vector<int>>& graph) {
     }
 
     if (visited.size() != graph.size()) {
-        std::cerr << "Error: DAG is not a single connected component" << std::endl;
+        std::cerr << "Error occured. Graph isn't a single connected component" << std::endl;
         return false;
     }
 
     return true;
 }
 
-void ExecuteJob(const std::string& jobName, pthread_barrier_t* barrier, std::atomic<bool>& errorFlag, const int execTime = 2) {
-    if (errorFlag) {
-        pthread_cond_broadcast(&queueCV);
-        return;
+void exec(const std::string& jobName, int jobId, pthread_barrier_t* barrier, std::atomic<bool>& errorFlag, const int execTime = 2) {
+    if (mustBreak == jobName) {
+        errorFlag = true;
     }
 
     if (barrier) {
@@ -126,7 +125,7 @@ void ExecuteJob(const std::string& jobName, pthread_barrier_t* barrier, std::ato
 
     pthread_mutex_lock(&stdoutMutex);
 
-    std::cout << "Starting job: " << jobName << std::endl;
+    std::cout << jobName << " (" << jobId << ") starts, it's id = " << jobId << ";" << std::endl;
 
     pthread_mutex_unlock(&stdoutMutex);
 
@@ -134,17 +133,17 @@ void ExecuteJob(const std::string& jobName, pthread_barrier_t* barrier, std::ato
 
     pthread_mutex_lock(&stdoutMutex);
 
-    if (mustBreak == jobName) {
-        std::cerr << "Job failed: " << jobName << std::endl;
-        errorFlag = true;
+    if (errorFlag) {
+        std::cerr << jobName << " (" << jobId << ") went wrong" << std::endl;
+        pthread_cond_broadcast(&queueCV);
     } else {
-        std::cout << "Job completed: " << jobName << std::endl;
+        std::cout << jobName << " (" << jobId << ") finished;" << std::endl;
     }
 
     pthread_mutex_unlock(&stdoutMutex);
 }
 
-void *ThreadProcess(void*) {
+void *thread_process(void*) {
     while (true) {
         int currentJob = -1;
 
@@ -173,7 +172,7 @@ void *ThreadProcess(void*) {
             if (!jobs[currentJob].barrierName.empty()) {
                 barrier = &barriers[jobs[currentJob].barrierName];
             }
-            ExecuteJob(jobs[currentJob].name, barrier, errorFlag, jobs[currentJob].time);
+            exec(jobs[currentJob].name, currentJob, barrier, errorFlag, jobs[currentJob].time);
 
             pthread_mutex_lock(&queueMutex);
 

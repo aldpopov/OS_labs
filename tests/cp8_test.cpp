@@ -8,7 +8,7 @@
 
 #include "cp8_utils.h"
 
-TEST(isCyclicUtil, test)
+TEST(is_cyclic_util, test)
 {
     auto id = 3;
     std::unordered_map<int, bool> visited1, recStack1;
@@ -25,14 +25,14 @@ TEST(isCyclicUtil, test)
         {3, {1, 2}}
     };
 
-    auto good = IsCyclicUtil(id, goodGraph, visited1, recStack1);
-    auto bad = IsCyclicUtil(id, badGraph, visited2, recStack2);
+    auto good = is_cyclic_util(id, goodGraph, visited1, recStack1);
+    auto bad = is_cyclic_util(id, badGraph, visited2, recStack2);
 
     ASSERT_FALSE(good);
     ASSERT_TRUE(bad);
 }
 
-TEST(isCyclic, test)
+TEST(is_cyclic, test)
 {
     std::unordered_map<int, std::vector<int>> goodGraph = {
         {1, {}},
@@ -46,14 +46,14 @@ TEST(isCyclic, test)
         {3, {1, 2}}
     };
 
-    auto good = IsCyclic(goodGraph);
-    auto bad = IsCyclic(badGraph);
+    auto good = is_cyclic(goodGraph);
+    auto bad = is_cyclic(badGraph);
 
     ASSERT_FALSE(good);
     ASSERT_TRUE(bad);
 }
 
-TEST(validateDAG, test)
+TEST(check_graph, test)
 {
     auto expectedResult = "Error: DAG contains cycles\nError: DAG is not a single connected component\n";
 
@@ -78,9 +78,9 @@ TEST(validateDAG, test)
 
     testing::internal::CaptureStderr();
 
-    auto good = CheckDAG(goodGraph);
-    auto bad1 = CheckDAG(badGraph1);
-    auto bad2 = CheckDAG(badGraph2);
+    auto good = check_graph(goodGraph);
+    auto bad1 = check_graph(badGraph1);
+    auto bad2 = check_graph(badGraph2);
 
     auto output = testing::internal::GetCapturedStderr();
 
@@ -90,11 +90,12 @@ TEST(validateDAG, test)
     ASSERT_EQ(output, expectedResult);
 }
 
-TEST(executeJob, test)
+TEST(exec, test)
 {
-    auto expectedResult = "Starting job: some\nJob completed: some\n";
+    auto expectedResult = "some (1) starts, it's id = 1;\nsome (1) finished;\n";
 
     auto name = "some";
+    int jobId = 1;
     pthread_barrier_t barrier;
     pthread_barrier_init(&barrier, nullptr, 1);
 
@@ -103,7 +104,7 @@ TEST(executeJob, test)
 
     testing::internal::CaptureStdout();
 
-    ExecuteJob(name, &barrier, errorFlag, execTime);
+    exec(name, jobId, &barrier, errorFlag, execTime);
 
     auto output = testing::internal::GetCapturedStdout();
 
@@ -112,10 +113,10 @@ TEST(executeJob, test)
     pthread_barrier_destroy(&barrier);
 }
 
-TEST(threadProcess, test)
+TEST(thread_process, test)
 {
-    auto expectedResult = "Starting job: a\nJob completed: a\nStarting job: b\nJob completed: b\n"
-                          "Starting job: c\nJob completed: c\nStarting job: d\nJob completed: d\n";
+    auto expectedResult = "a (1) starts, it's id = 1;\na (1) finished;\nb (2) starts, it's id = 2;\nb (2) finished;\n"
+                          "c (3) starts, it's id = 3;\nc (3) finished;\nd (4) starts, it's id = 4;\nd (4) finished;\n";
 
     readyJobs.push(1);
     readyJobs.push(2);
@@ -155,7 +156,7 @@ TEST(threadProcess, test)
     testing::internal::CaptureStdout();
 
     pthread_t thread;
-    pthread_create(&thread, nullptr, ThreadProcess, nullptr);
+    pthread_create(&thread, nullptr, thread_process, nullptr);
 
     pthread_join(thread, nullptr);
 
