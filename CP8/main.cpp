@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 #include <unordered_set>
 #include <sstream>
+#include <map>
 
 std::string GetConfigFileName() {
     std::string configFile;
@@ -57,6 +58,8 @@ int main(int argc, char* argv[]) {
     file.close();
 
     std::unordered_set<int> ids;
+    std::map<std::string, int> barrierUsage;
+
     for (const auto& job : config["jobs"]) {
         int id;
         try {
@@ -78,11 +81,28 @@ int main(int argc, char* argv[]) {
 
         if (job["barrier"]) {
             const std::string barrier_name = job["barrier"].as<std::string>();
-            if (barriers.find(barrier_name) == barriers.end()) {
-                int barrier_count = 1;
-                if (job["barrier_count"]) {
-                    barrier_count = job["barrier_count"].as<int>();
+            barrierUsage[barrier_name]++;
+        }
+    }
+
+    for (const auto& job : config["jobs"]) {
+        if (job["barrier"]) {
+            const std::string barrier_name = job["barrier"].as<std::string>();
+            int barrier_count = barrierUsage[barrier_name];
+
+            if (job["barrier_count"]) {
+                barrier_count = job["barrier_count"].as<int>();
+                if (barrier_count > barrierUsage[barrier_name]) {
+                    std::cerr << "Error occured: barrier_count for " << barrier_name << " is greater than the number of jobs using it" << std::endl;
+                    return 1;
                 }
+                if (barrier_count <= 0) {
+                    std::cerr << "Error occured: barrier_count for " << barrier_name << " must be greater than 0" << std::endl;
+                    return 1;
+                }
+            }
+
+            if (barriers.find(barrier_name) == barriers.end()) {
                 pthread_barrier_t barrier;
                 pthread_barrier_init(&barrier, nullptr, barrier_count);
                 barriers.emplace(barrier_name, barrier);

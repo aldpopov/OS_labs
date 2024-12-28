@@ -53,7 +53,7 @@ bool check_graph(std::unordered_map<int, std::vector<int>>& graph) {
     std::vector<int> startJobs, endJobs;
 
     if (is_cyclic(graph)) {
-        std::cerr << "Error occured. Graph is cycleic" << std::endl;
+        std::cerr << "Error occured. Graph is cyclic" << std::endl;
         return false;
     }
 
@@ -115,8 +115,8 @@ bool check_graph(std::unordered_map<int, std::vector<int>>& graph) {
 }
 
 void exec(const std::string& jobName, int jobId, pthread_barrier_t* barrier, std::atomic<bool>& errorFlag, const int execTime = 2) {
-    if (mustBreak == jobName) {
-        errorFlag = true;
+    if (mustBreak==jobName) {
+        errorFlag=true;
     }
 
     if (barrier) {
@@ -133,7 +133,7 @@ void exec(const std::string& jobName, int jobId, pthread_barrier_t* barrier, std
 
     pthread_mutex_lock(&stdoutMutex);
 
-    if (errorFlag) {
+    if (mustBreak == jobName) {
         std::cerr << jobName << " (" << jobId << ") went wrong" << std::endl;
         pthread_cond_broadcast(&queueCV);
     } else {
